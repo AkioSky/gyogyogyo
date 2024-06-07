@@ -1,0 +1,40 @@
+generator client {
+  provider      = "prisma-client-js"
+}
+
+datasource db {
+  provider      = "postgresql"
+  url           = env("POSTGRES_PRISMA_URL")        // uses connection pooling
+  directUrl     = env("POSTGRES_URL_NON_POOLING")   // uses a direct connection
+}
+
+model Product {
+  id            String      @default(cuid()) @id
+  name          String      @unique
+  price         Float       @default(0)
+  store         Store?      @relation(fields: [storeId], references: [id])
+  storeId       String?
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+  @@map(name: "products")
+}
+
+model Store {
+  id            String      @default(cuid()) @id
+  name          String      @unique
+  address       String?      
+  products      Product[]
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+  @@map(name: "stores")
+}
+
+model User {
+  id            String      @default(cuid()) @id
+  name          String?
+  email         String      @unique
+  password      String
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
+  @@map(name: "users")
+}
