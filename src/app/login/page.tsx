@@ -24,12 +24,12 @@ export default function Login() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message);
+        setError(data.message);
+      } else {
+        router.push('/dashboard');
       }
-
-      router.push('/dashboard');
     } catch (error) {
-      setError(error?.message);
+      console.log('error:', error);
     }
   };
 
