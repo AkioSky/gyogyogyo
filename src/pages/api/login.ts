@@ -30,6 +30,7 @@ export default async function handler(
     // Passwords match, return a success message
     res.status(200).json({ status: 'Success', message: 'Login successful' });
   } else {
-    res.status(405).json({ message: 'Method Not Allowed' });
+    res.setHeader('Allow', ['POST']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
