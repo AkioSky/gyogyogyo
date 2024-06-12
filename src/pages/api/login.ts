@@ -31,6 +31,6 @@ export default async function handler(
     res.status(200).json({ status: 'Success', message: 'Login successful' });
   } else {
     res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    res.status(405).end(`login method ${req.method} not allowed`);
   }
 }
