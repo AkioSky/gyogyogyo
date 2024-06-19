@@ -1,14 +1,20 @@
-import Dashboard from './dashboard/page';
-import { cookies } from 'next/headers';
-import Login from './login/page';
+'use client';
 
-async function getSession() {
-  const sessionId = cookies().get('sessionId')?.value;
-  // return sessionId ? await db.findSession(sessionId) : null;
-}
+import Dashboard from './dashboard';
+import { useSession } from 'next-auth/react';
+import SignIn from './auth/signin';
 
-export default async function Home() {
-  const session = await getSession();
+const Home = () => {
+  const { status } = useSession();
+  if (status === 'loading') {
+    /* empty */
+  }
 
-  return <Login />;
-}
+  if (status === 'unauthenticated') {
+    return <SignIn />;
+  }
+
+  return <Dashboard />;
+};
+
+export default Home;

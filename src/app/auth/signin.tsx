@@ -1,35 +1,29 @@
 'use client';
 
+import { signIn } from 'next-auth/react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 
-export default function Login() {
-  const router = useRouter();
-  const [error, setError] = useState('');
+export default function SignIn() {
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      const formData = new FormData(e.currentTarget);
-      const email = formData.get('email');
-      const password = formData.get('password');
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email');
+    const password = formData.get('password');
 
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
 
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.message);
-      } else {
-        router.push('/dashboard');
-      }
-    } catch (error) {
-      console.log('error:', error);
+    if (res?.error) {
+      setError('Invalid ID or password');
+    } else {
+      setError(null);
     }
   };
 

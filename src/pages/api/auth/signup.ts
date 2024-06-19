@@ -1,6 +1,7 @@
 'use server';
-import prisma from '@/lib/prisma';
+
 import { NextApiRequest, NextApiResponse } from 'next';
+import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 
 // bcrypt.hash(password, 10).then(function (hash) {
