@@ -1,11 +1,12 @@
 'use client';
 
-import Dashboard from './dashboard';
+import Dashboard from './dashboard/page';
 import { useSession } from 'next-auth/react';
 import SignIn from './auth/signin';
 
 const Home = () => {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
+  console.log('session:', session);
   if (status === 'loading') {
     /* empty */
   }
