@@ -1,10 +1,10 @@
 'use client';
 
-import Dashboard from './dashboard/page';
+import Home from './home/page';
 import { useSession } from 'next-auth/react';
 import SignIn from './auth/signin';
 
-const Home = () => {
+const Page = () => {
   const { data: session, status } = useSession();
   console.log('session:', session);
   if (status === 'loading') {
@@ -15,7 +15,7 @@ const Home = () => {
     return <SignIn />;
   }
 
-  return <Dashboard />;
+  return <Home />;
 };
 
-export default Home;
+export default Page;

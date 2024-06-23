@@ -26,3 +26,60 @@ body {
     text-wrap: balance;
   }
 }
+
+.react-calendar {
+  border: none !important;
+}
+
+.react-calendar__tile {
+  /* font-size: 22px !important; */
+  font-weight: bold !important;
+}
+
+.react-calendar__tile--now {
+  background: #ffff00 !important;
+  color: #000 !important;
+}
+
+.react-calendar__navigation button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.react-calendar__navigation__label__labelText {
+  font-weight: bold;
+  font-size: 22px;
+}
+
+.react-calendar__month-view__days__day {
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.react-calendar__month-view__days__day--weekend {
+  color: #000 !important;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.calendar-date-before-today {
+  background-color: #e2e2e2 !important;
+}
+
+.calendar-date-input {
+  background-color: #f795ba !important;
+}
+
+.react-calendar__navigation {
+  margin-bottom: 8px !important;
+}
+
+.react-calendar__viewContainer {
+  border-color: #707070;
+  border-width: 1px;
+  border-style: solid;
+}

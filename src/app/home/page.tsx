@@ -4,7 +4,7 @@ import Navbar from '@/app/components/navigation/navbar';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-export default function Dashboard() {
+export default function Page() {
   const { push } = useRouter();
 
   return (
@@ -13,7 +13,7 @@ export default function Dashboard() {
       <div className='mt-16 flex flex-col items-center'>
         <button
           className='flex w-80 flex-col items-center rounded-3xl border-4 border-black py-6'
-          onClick={() => push('/storeselect')}
+          onClick={() => push('/store')}
         >
           <Image width={36} height={36} src='/pen.svg' alt={'pen-icon'} />
           <p className='mt-3 text-2xl font-bold'>店舗記録</p>
