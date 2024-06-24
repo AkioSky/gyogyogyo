@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Store } from '@prisma/client';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Loader from '../components/loader';
 
 const RenderStore = (store: Store) => {
   return (
@@ -23,7 +24,7 @@ const RenderStore = (store: Store) => {
 
 export default function Page() {
   const router = useRouter();
-
+  const [loading, setLoading] = useState(true);
   const [stores, setStores] = useState<Store[]>([]);
 
   useEffect(() => {
@@ -32,28 +33,32 @@ export default function Page() {
       .then((res) => {
         console.log('res:', res);
         setStores(res.data || []);
+        setLoading(false);
       })
       .catch((err) => {
         console.log('err:', err);
         setStores([]);
+        setLoading(false);
       });
   }, []);
 
-  return (
-    <main>
-      <Navbar title='店舗選択' />
-      <div className='px-10 py-8'>
-        {stores.map((store, index) => (
-          <div
-            key={index}
-            onClick={() => {
-              router.push(`/store/${store.id}`);
-            }}
-          >
-            {RenderStore(store)}
-          </div>
-        ))}
-      </div>
-    </main>
-  );
+  if (loading) return <Loader />;
+  else
+    return (
+      <main>
+        <Navbar title='店舗選択' />
+        <div className='px-10 py-8'>
+          {stores.map((store, index) => (
+            <div
+              key={index}
+              onClick={() => {
+                router.push(`/store/${store.id}`);
+              }}
+            >
+              {RenderStore(store)}
+            </div>
+          ))}
+        </div>
+      </main>
+    );
 }

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import Image from 'next/image';
 import 'react-calendar/dist/Calendar.css';
+import Loader from '@/app/components/loader';
 
 type ValuePiece = Date | null;
 
@@ -15,6 +16,7 @@ type Value = ValuePiece | [ValuePiece, ValuePiece];
 export default function Page({ params }: { params: { id: string } }) {
   const [store, setStore] = useState<Store | null>(null);
   const [value, setValue] = useState<Value>(new Date());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (params.id) {
@@ -23,10 +25,12 @@ export default function Page({ params }: { params: { id: string } }) {
         .then((res) => {
           console.log('res:', res);
           setStore(res.data);
+          setLoading(false);
         })
         .catch((err) => {
           console.log('err:', err);
           setStore(null);
+          setLoading(false);
         });
     }
   }, [params.id]);
@@ -53,58 +57,60 @@ export default function Page({ params }: { params: { id: string } }) {
     return date.getDate().toString();
   };
 
-  return (
-    <main className='flex h-screen flex-col'>
-      <Navbar title='カレンダー' />
-      {store && (
-        <>
-          <div className='bg-[#EAEAEA] py-2 text-center'>
-            <p className='text-xl font-bold'>{store?.name}</p>
-          </div>
-          <div className='flex flex-1 flex-col justify-between'>
-            <div className='mt-4 flex items-center justify-center'>
-              <Calendar
-                calendarType='gregory'
-                tileClassName={tileClassName}
-                onChange={setValue}
-                value={value}
-                showNeighboringMonth={false}
-                locale='ja'
-                view='month'
-                nextLabel={
-                  <Image
-                    width={13}
-                    height={22}
-                    src='/right_arrow.svg'
-                    alt={'next-icon'}
-                  />
-                }
-                next2Label={null}
-                prevLabel={
-                  <Image
-                    width={13}
-                    height={22}
-                    src='/left_arrow.svg'
-                    alt={'left-icon'}
-                  />
-                }
-                prev2Label={null}
-                formatMonthYear={formatMonthYear}
-                formatDay={formatDay}
-              />
+  if (loading) return <Loader />;
+  else
+    return (
+      <main className='flex h-screen flex-col'>
+        <Navbar title='カレンダー' />
+        {store && (
+          <>
+            <div className='bg-[#EAEAEA] py-2 text-center'>
+              <p className='text-xl font-bold'>{store?.name}</p>
             </div>
-            <div className='mb-12'>
-              <p className='text-center text-[22px] font-bold'>
-                今月の累計売上
-              </p>
-              <p className='my-1 text-center text-[22px] font-bold'>¥0</p>
-              <p className='font-xl text-center text-[16px]'>
-                最終集計日：03/11
-              </p>
+            <div className='flex flex-1 flex-col justify-between'>
+              <div className='mt-4 flex items-center justify-center'>
+                <Calendar
+                  calendarType='gregory'
+                  tileClassName={tileClassName}
+                  // onChange={setValue}
+                  // value={value}
+                  showNeighboringMonth={false}
+                  locale='ja'
+                  view='month'
+                  nextLabel={
+                    <Image
+                      width={13}
+                      height={22}
+                      src='/right_arrow.svg'
+                      alt={'next-icon'}
+                    />
+                  }
+                  next2Label={null}
+                  prevLabel={
+                    <Image
+                      width={13}
+                      height={22}
+                      src='/left_arrow.svg'
+                      alt={'left-icon'}
+                    />
+                  }
+                  prev2Label={null}
+                  formatMonthYear={formatMonthYear}
+                  formatDay={formatDay}
+                />
+              </div>
+              <div className='mb-12'>
+                <p className='text-center text-[22px] font-bold'>
+                  今月の累計売上
+                </p>
+                <p className='my-1 text-center text-[22px] font-bold'>¥0</p>
+                <p className='font-xl text-center text-[16px]'>
+                  最終集計日：03/11
+                </p>
+              </div>
             </div>
-          </div>
-        </>
-      )}
-    </main>
-  );
+          </>
+        )}
+      </main>
+    );
 }
