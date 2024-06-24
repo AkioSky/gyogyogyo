@@ -53,52 +53,58 @@ export default function Page({ params }: { params: { id: string } }) {
     return date.getDate().toString();
   };
 
-  if (store) {
-    return (
-      <main>
-        <Navbar title='カレンダー' />
-        <div className='bg-[#EAEAEA] py-2 text-center'>
-          <p className='text-xl font-bold'>{store?.name}</p>
-        </div>
-        <div className='my-4 flex items-center justify-center'>
-          <Calendar
-            calendarType='gregory'
-            tileClassName={tileClassName}
-            onChange={setValue}
-            value={value}
-            showNeighboringMonth={false}
-            locale='ja'
-            view='month'
-            nextLabel={
-              <Image
-                width={13}
-                height={22}
-                src='/right_arrow.svg'
-                alt={'next-icon'}
+  return (
+    <main className='flex h-screen flex-col'>
+      <Navbar title='カレンダー' />
+      {store && (
+        <>
+          <div className='bg-[#EAEAEA] py-2 text-center'>
+            <p className='text-xl font-bold'>{store?.name}</p>
+          </div>
+          <div className='flex flex-1 flex-col justify-between'>
+            <div className='mt-4 flex items-center justify-center'>
+              <Calendar
+                calendarType='gregory'
+                tileClassName={tileClassName}
+                onChange={setValue}
+                value={value}
+                showNeighboringMonth={false}
+                locale='ja'
+                view='month'
+                nextLabel={
+                  <Image
+                    width={13}
+                    height={22}
+                    src='/right_arrow.svg'
+                    alt={'next-icon'}
+                  />
+                }
+                next2Label={null}
+                prevLabel={
+                  <Image
+                    width={13}
+                    height={22}
+                    src='/left_arrow.svg'
+                    alt={'left-icon'}
+                  />
+                }
+                prev2Label={null}
+                formatMonthYear={formatMonthYear}
+                formatDay={formatDay}
               />
-            }
-            next2Label={null}
-            prevLabel={
-              <Image
-                width={13}
-                height={22}
-                src='/left_arrow.svg'
-                alt={'left-icon'}
-              />
-            }
-            prev2Label={null}
-            formatMonthYear={formatMonthYear}
-            formatDay={formatDay}
-          />
-        </div>
-        <p className='mt-12 text-center text-[22px] font-bold'>
-          今月の累計売上
-        </p>
-        <p className='my-1 text-center text-[22px] font-bold'>¥0</p>
-        <p className='font-xl text-center text-[16px]'>最終集計日：03/11</p>
-      </main>
-    );
-  } else {
-    return <></>;
-  }
+            </div>
+            <div className='mb-12'>
+              <p className='text-center text-[22px] font-bold'>
+                今月の累計売上
+              </p>
+              <p className='my-1 text-center text-[22px] font-bold'>¥0</p>
+              <p className='font-xl text-center text-[16px]'>
+                最終集計日：03/11
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+    </main>
+  );
 }
