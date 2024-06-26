@@ -8,33 +8,65 @@ datasource db {
   directUrl     = env("POSTGRES_URL_NON_POOLING")   // uses a direct connection
 }
 
-model Product {
-  id            String      @default(cuid()) @id
-  name          String      @unique
-  price         Float       @default(0)
-  store         Store?      @relation(fields: [storeId], references: [id])
-  storeId       String?
-  createdAt     DateTime    @default(now()) @map(name: "created_at")
-  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
-  @@map(name: "products")
-}
-
-model Store {
-  id            String      @default(cuid()) @id
-  name          String      @unique
-  address       String?      
-  products      Product[]
-  createdAt     DateTime    @default(now()) @map(name: "created_at")
-  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
-  @@map(name: "stores")
-}
-
 model User {
   id            String      @default(cuid()) @id
   name          String?
   email         String      @unique
   password      String
+  scope         String?
+  companyId     String?
+  storeId       String[]
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
   @@map(name: "users")
+}
+
+model Company {
+  id            Int         @default(autoincrement()) @id
+  name          String?     @unique
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
+  @@map(name: "company")
+}
+
+model Category {
+  id            Int         @default(autoincrement()) @id
+  name          String?     @unique
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
+  @@map(name: "category")
+}
+
+model Manufacturer {
+  id            Int         @default(autoincrement()) @id
+  name          String?     @unique
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
+  @@map(name: "manufacturer")
+}
+
+model Store {
+  id            String      @default(cuid()) @id
+  name          String      @unique
+  category      String?
+  companyId     String?     @unique
+  state         String?
+  zipcode       String?
+  address       String?      
+  // products      Product[]
+  openAt        DateTime?   @map(name: "open_at")
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+  @@map(name: "stores")
+}
+
+model Product {
+  id            String      @default(cuid()) @id
+  name          String      @unique
+  price         Float       @default(0)
+  // store         Store?      @relation(fields: [storeId], references: [id])
+  // storeId       String?     @unique
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+  @@map(name: "products")
 }

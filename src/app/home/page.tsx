@@ -1,15 +1,15 @@
 'use client';
 
-import Navbar from '@/app/components/navigation/navbar';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Navbar from '@/app/components/navigation/navbar';
 
 export default function Page() {
   const { push } = useRouter();
 
   return (
     <main>
-      <Navbar title='メニュー' />
+      <Navbar title='メニュー' noBack={true} />
       <div className='mt-16 flex flex-col items-center'>
         <button
           className='flex w-80 flex-col items-center rounded-3xl border-4 border-black py-6'

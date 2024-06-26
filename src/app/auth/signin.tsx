@@ -1,8 +1,8 @@
 'use client';
 
+import { FormEvent, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
-import { FormEvent, useState } from 'react';
 
 export default function SignIn() {
   const [error, setError] = useState<string | null>(null);

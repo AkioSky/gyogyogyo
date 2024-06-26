@@ -1,11 +1,11 @@
 'use client';
 
-import Navbar from '@/app/components/navigation/navbar';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Store } from '@prisma/client';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import axios from 'axios';
+import Navbar from '@/app/components/navigation/navbar';
+import { Store } from '@prisma/client';
 import Loader from '../components/loader';
 
 const RenderStore = (store: Store) => {
@@ -31,7 +31,6 @@ export default function Page() {
     axios
       .post('/api/store')
       .then((res) => {
-        console.log('res:', res);
         setStores(res.data || []);
         setLoading(false);
       })

@@ -1,21 +1,23 @@
 'use client';
 
-import Navbar from '@/app/components/navigation/navbar';
-import axios from 'axios';
-import { Store } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import axios from 'axios';
 import 'react-calendar/dist/Calendar.css';
+import Navbar from '@/app/components/navigation/navbar';
 import Loader from '@/app/components/loader';
+import { Store } from '@prisma/client';
 
-type ValuePiece = Date | null;
+// type ValuePiece = Date | null;
 
-type Value = ValuePiece | [ValuePiece, ValuePiece];
+// type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 export default function Page({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const [store, setStore] = useState<Store | null>(null);
-  const [value, setValue] = useState<Value>(new Date());
+  // const [value, setValue] = useState<Value>(new Date());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +25,6 @@ export default function Page({ params }: { params: { id: string } }) {
       axios
         .post(`/api/store/item`, { id: params.id })
         .then((res) => {
-          console.log('res:', res);
           setStore(res.data);
           setLoading(false);
         })
@@ -72,8 +73,6 @@ export default function Page({ params }: { params: { id: string } }) {
                 <Calendar
                   calendarType='gregory'
                   tileClassName={tileClassName}
-                  // onChange={setValue}
-                  // value={value}
                   showNeighboringMonth={false}
                   locale='ja'
                   view='month'
@@ -97,6 +96,10 @@ export default function Page({ params }: { params: { id: string } }) {
                   prev2Label={null}
                   formatMonthYear={formatMonthYear}
                   formatDay={formatDay}
+                  onClickDay={(value) => {
+                    const day = value.toISOString().split('T')[0];
+                    router.push(`/store/${params.id}/${day}`);
+                  }}
                 />
               </div>
               <div className='mb-12'>
