@@ -46,13 +46,14 @@ export default function Page() {
     return (
       <main>
         <Navbar title='店舗選択' />
-        <div className='px-10 py-8'>
+        <div className='mx-auto mt-8 max-w-5xl border-t border-[#707070] pb-16'>
           {stores.map((store, index) => (
             <div
               key={index}
               onClick={() => {
                 router.push(`/store/${store.id}`);
               }}
+              className='border-b border-[#707070]'
             >
               {RenderStore(store)}
             </div>
