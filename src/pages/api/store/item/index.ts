@@ -30,8 +30,9 @@ export default async function handler(
     const days = _.map(dates, (date) =>
       parseInt(moment.tz(date, 'Asia/Tokyo').format('DD'))
     );
+    const totalSalesSum = _.sumBy(sales, 'totalSales');
 
-    res.status(200).json({ store, days });
+    res.status(200).json({ store, days, totalSalesSum });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch store' });
   }
