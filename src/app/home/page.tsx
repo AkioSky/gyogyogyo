@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Navbar from '@/app/components/navigation/navbar/page';
+import Navbar from '@/app/components/navigation/navbar';
 
 export default function Page() {
   const { push } = useRouter();

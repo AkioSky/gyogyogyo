@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Navbar from '@/app/components/navigation/navbar/page';
+import Navbar from '@/app/components/navigation/navbar';
 import Loader from '@/app/components/loader';
 import { Store, Product, ProductSale } from '@prisma/client';
 import _ from 'lodash';

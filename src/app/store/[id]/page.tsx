@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import axios from 'axios';
 import 'react-calendar/dist/Calendar.css';
-import Navbar from '@/app/components/navigation/navbar/page';
+import Navbar from '@/app/components/navigation/navbar';
 import { Store } from '@prisma/client';
 import moment from 'moment-timezone';
 import { Hourglass } from 'react-loader-spinner';

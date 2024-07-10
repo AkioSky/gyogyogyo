@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import axios from 'axios';
-import Navbar from '@/app/components/navigation/navbar/page';
+import Navbar from '@/app/components/navigation/navbar';
 import { Store } from '@prisma/client';
 import Loader from '../components/loader';
 
