@@ -6,26 +6,33 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import axios from 'axios';
 import 'react-calendar/dist/Calendar.css';
-import Navbar from '@/app/components/navigation/navbar';
+import Navbar from '@/app/components/navigation/navbar/page';
 import Loader from '@/app/components/loader';
 import { Store } from '@prisma/client';
+import moment from 'moment-timezone';
 
-// type ValuePiece = Date | null;
-
-// type Value = ValuePiece | [ValuePiece, ValuePiece];
+const getFirstDateOfMonth = () => {
+  return moment.tz('Asia/Tokyo').startOf('month').toDate();
+};
 
 export default function Page({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [store, setStore] = useState<Store | null>(null);
-  // const [value, setValue] = useState<Value>(new Date());
+  const [days, setDays] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [startDate, setStartDate] = useState<Date | null>(
+    getFirstDateOfMonth()
+  );
 
   useEffect(() => {
     if (params.id) {
       axios
-        .post(`/api/store/item`, { id: params.id })
+        .post(`/api/store/item`, { id: params.id, startDate })
         .then((res) => {
-          setStore(res.data);
+          if (res.status === 200) {
+            setStore(res.data.store);
+            setDays(res.data.days);
+          }
           setLoading(false);
         })
         .catch((err) => {
@@ -34,14 +41,14 @@ export default function Page({ params }: { params: { id: string } }) {
           setLoading(false);
         });
     }
-  }, [params.id]);
+  }, [params.id, startDate]);
 
   const tileClassName = ({ date, view }: { date: Date; view: string }) => {
     if (view === 'month') {
       const today = new Date();
       today.setHours(0, 0, 0, 0); // reset time part for accurate comparison
 
-      if (date.getDate() === 4 || date.getDate() === 11) {
+      if (days.includes(date.getDate())) {
         return 'calendar-date-input';
       } else if (date < today) {
         return 'calendar-date-before-today';
@@ -98,16 +105,25 @@ export default function Page({ params }: { params: { id: string } }) {
                   formatDay={formatDay}
                   onClickDay={(value) => {
                     const day = value.toISOString().split('T')[0];
-                    router.push(`/store/${params.id}/${day}`);
+                    if (days.includes(parseInt(day.split('-')[2]))) {
+                      router.push(`/store/${params.id}/${day}/get`);
+                    } else {
+                      router.push(`/store/${params.id}/${day}/new`);
+                    }
                   }}
+                  onViewChange={({ activeStartDate }) =>
+                    setStartDate(activeStartDate)
+                  }
+                  onActiveStartDateChange={({ activeStartDate }) =>
+                    setStartDate(activeStartDate)
+                  }
+                  // maxDate={new Date()}
                 />
               </div>
               <div className='mb-12'>
-                <p className='text-center text-[22px] font-bold'>
-                  今月の累計売上
-                </p>
-                <p className='my-1 text-center text-[22px] font-bold'>¥0</p>
-                <p className='font-xl text-center text-[16px]'>
+                <p className='text-center text-xl font-bold'>今月の累計売上</p>
+                <p className='my-1 text-center text-xl font-bold'>¥0</p>
+                <p className='font-xl text-center text-base'>
                   最終集計日：03/11
                 </p>
               </div>

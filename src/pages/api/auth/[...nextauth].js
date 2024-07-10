@@ -21,7 +21,10 @@ export const authOptions = {
         const user = await prisma.user.findUnique({
           where: { email: credentials?.email },
         });
+        const hashedPassword = bcrypt.hashSync(credentials?.password, 10);
+        console.log('hashedPassword:', hashedPassword);
         if (user && bcrypt.compareSync(credentials?.password, user.password)) {
+          console.log('here1');
           return { id: user.id, email: user.email };
         }
         return null;

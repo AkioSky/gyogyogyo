@@ -1,18 +1,15 @@
 import React from 'react';
-import { TailSpin } from 'react-loader-spinner';
+import { Hourglass } from 'react-loader-spinner';
 
 const Loader = () => {
   return (
     <div className='flex h-screen items-center justify-center'>
-      <TailSpin
+      <Hourglass
         visible={true}
-        height='80'
-        width='80'
-        color='#4fa94d'
-        ariaLabel='tail-spin-loading'
-        radius='1'
-        wrapperStyle={{}}
-        wrapperClass=''
+        height='50'
+        width='50'
+        ariaLabel='hourglass-loading'
+        colors={['#000', '#000']}
       />
     </div>
   );

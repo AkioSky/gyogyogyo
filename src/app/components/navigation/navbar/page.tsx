@@ -20,7 +20,7 @@ const Navbar = ({ title, noBack = false }: Props) => {
           </button>
         )}
       </div>
-      <p className='text-2xl font-bold text-white'>{title}</p>
+      <p className='text-xl font-bold text-white'>{title}</p>
       <button onClick={() => replace('/')}>
         <Image width={24} height={24} src='/home.svg' alt={'home-icon'} />
       </button>

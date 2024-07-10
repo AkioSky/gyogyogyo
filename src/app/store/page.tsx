@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import axios from 'axios';
-import Navbar from '@/app/components/navigation/navbar';
+import Navbar from '@/app/components/navigation/navbar/page';
 import { Store } from '@prisma/client';
 import Loader from '../components/loader';
 
 const RenderStore = (store: Store) => {
   return (
-    <div className='my-4 flex flex-row items-center justify-between'>
+    <div className='my-4 flex flex-row items-center justify-between px-6'>
       <p className='text-xl font-bold'>{store.name}</p>
       <Image
         width={13}
@@ -46,14 +46,14 @@ export default function Page() {
     return (
       <main>
         <Navbar title='店舗選択' />
-        <div className='mx-auto mt-8 max-w-5xl border-t border-[#707070] pb-16'>
+        <div className='mx-auto mt-8 border-t border-[#707070] pb-16 sm:max-w-xl md:max-w-2xl lg:max-w-4xl xl:max-w-5xl'>
           {stores.map((store, index) => (
             <div
               key={index}
               onClick={() => {
                 router.push(`/store/${store.id}`);
               }}
-              className='border-b border-[#707070]'
+              className='cursor-pointer border-b border-[#707070]'
             >
               {RenderStore(store)}
             </div>

@@ -58,6 +58,7 @@ model Store {
   zipcode       String?
   address       String?      
   products      Product[]
+  sales         Sales[]
   openAt        DateTime?   @map(name: "open_at")
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
@@ -68,14 +69,52 @@ model Product {
   id            String      @default(cuid()) @id
   name          String      @unique
   basicPrice    Float       @default(0)
-  manufacturerId  Int
+  manufacturerId  Int?
   manufacturer  Manufacturer?   @relation(fields: [manufacturerId], references: [id])
-  categoryId    Int
+  categoryId    Int?
   category      Category?   @relation(fields: [categoryId], references: [id])
-  displayCount  Int
+  displayCount  Int?
   store         Store?      @relation(fields: [storeId], references: [id])
   storeId       String?     
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   @@map(name: "products")
+}
+
+model CurrentProductCount {
+  id            String      @default(cuid()) @id
+  storeId       String
+  productId     String
+  count         Int
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+  @@map(name: "current_product_count")
+}
+
+model ProductSale {
+  id            String      @default(cuid()) @id
+  date          DateTime    @db.Date
+  storeId       String
+  productId     String
+  previousCount Int
+  remainCount   Int
+  restockCount  Int
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+  @@map(name: "product_sale")
+}
+
+model Sales {
+  id            String      @default(cuid()) @id
+  date          DateTime    @db.Date
+  storeId       String
+  store         Store?      @relation(fields: [storeId], references: [id])
+  totalSales    Int
+  storeCollection   Int
+  paypayCollection  Int
+  paypayTimeHour    Int
+  paypayTimeMin     Int
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+  @@map(name: "sales")
 }

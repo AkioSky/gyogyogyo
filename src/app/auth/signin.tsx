@@ -1,11 +1,13 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { Hourglass } from 'react-loader-spinner';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 
 export default function SignIn() {
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -13,13 +15,14 @@ export default function SignIn() {
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email');
     const password = formData.get('password');
-
+    setLoading(true);
+    setError(null);
     const res = await signIn('credentials', {
       email,
       password,
       redirect: false,
     });
-
+    setLoading(false);
     if (res?.error) {
       setError('Invalid ID or password');
     } else {
@@ -53,11 +56,24 @@ export default function SignIn() {
           required
         />
       </div>
-      {error && <p className='text-[#d90000]'>** {error} **</p>}
+
+      <div className='flex min-h-12 flex-col'>
+        {error && <p className='text-sm text-[#d90000]'>** {error} **</p>}
+        {loading && (
+          <Hourglass
+            visible={true}
+            height='24'
+            width='24'
+            ariaLabel='hourglass-loading'
+            wrapperClass='self-center my-auto'
+            colors={['#000', '#000']}
+          />
+        )}
+      </div>
 
       <button
         type='submit'
-        className='mt-12 w-80 rounded-3xl bg-[#d90000] py-2 text-center text-white'
+        className='mt-4 w-80 rounded-3xl bg-[#d90000] py-2 text-center text-white'
       >
         ログイン
       </button>

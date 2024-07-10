@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Navbar from '@/app/components/navigation/navbar';
+import Navbar from '@/app/components/navigation/navbar/page';
 
 export default function Page() {
   const { push } = useRouter();
@@ -16,11 +16,11 @@ export default function Page() {
           onClick={() => push('/store')}
         >
           <Image width={36} height={36} src='/pen.svg' alt={'pen-icon'} />
-          <p className='mt-3 text-2xl font-bold'>店舗記録</p>
+          <p className='mt-3 text-xl font-bold'>店舗記録</p>
         </button>
         <button className='mt-6 flex w-80 flex-col items-center rounded-3xl border-4 border-black py-6'>
           <Image width={36} height={36} src='/doc.png' alt={'doc-icon'} />
-          <p className='mt-3 text-2xl font-bold'>各種データ</p>
+          <p className='mt-3 text-xl font-bold'>各種データ</p>
         </button>
       </div>
 
