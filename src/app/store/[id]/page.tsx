@@ -12,7 +12,15 @@ import moment from 'moment-timezone';
 import { Hourglass } from 'react-loader-spinner';
 
 const getFirstDateOfMonth = () => {
-  return moment.tz('Asia/Tokyo').startOf('month').toDate();
+  const currentDate = new Date();
+
+  const firstDateOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  );
+  return firstDateOfMonth;
+  // return moment.tz('Asia/Tokyo').startOf('month').toDate();
 };
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -28,7 +36,6 @@ export default function Page({ params }: { params: { id: string } }) {
   useEffect(() => {
     setLoading(true);
     if (params.id) {
-      console.log('startDate:', startDate);
       axios
         .post(`/api/store/item`, { id: params.id, startDate })
         .then((res) => {
