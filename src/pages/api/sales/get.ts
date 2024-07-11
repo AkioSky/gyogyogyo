@@ -2,7 +2,6 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
-import moment from 'moment-timezone';
 
 export default async function handler(
   req: NextApiRequest,

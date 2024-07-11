@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '@/app/components/navigation/navbar';
 import Loader from '@/app/components/loader';
-import { Store, Product, ProductSale } from '@prisma/client';
+import { Store, Product } from '@prisma/client';
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import { CombinedProduct } from '@/app/models/CombinedProduct';

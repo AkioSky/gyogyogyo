@@ -4,12 +4,10 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '@/app/components/navigation/navbar';
 import Loader from '@/app/components/loader';
-import { Store, Product, ProductSale } from '@prisma/client';
+import { Store, ProductSale } from '@prisma/client';
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import { CombinedProduct } from '@/app/models/CombinedProduct';
-import { Hourglass } from 'react-loader-spinner';
-import { useRouter } from 'next/navigation';
 
 const ProductInput = ({ value }: { value: number }) => (
   <input
@@ -26,7 +24,6 @@ export default function Page({
   params: { date: string; id: string };
 }) {
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<CombinedProduct[]>([]);
   const [totalSales, setTotalSales] = useState<number>(0);
@@ -38,9 +35,6 @@ export default function Page({
   const [paypayTimeMin, setPaypayTimeMin] = useState<number>(
     moment.tz('Asia/Tokyo').minute()
   );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { back } = useRouter();
 
   useEffect(() => {
     axios
@@ -92,50 +86,6 @@ export default function Page({
     }, 0);
     setTotalSales(total);
   }, [products]);
-
-  const handleInputChange = (
-    product: CombinedProduct,
-    key: keyof CombinedProduct,
-    value: number
-  ) => {
-    if (key === 'previousCount' && value < product.remainCount) {
-      return;
-    } else if (key === 'remainCount' && value > product.previousCount) {
-      return;
-    }
-    const updatedProducts = products.map((_product) =>
-      _product.id === product.id ? { ...product, [key]: value } : _product
-    );
-    setProducts(updatedProducts);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const submitData = () => {
-    setSaving(true);
-    axios
-      .post('/api/sales/save', {
-        products,
-        storeId: params.id,
-        date: params.date,
-        totalSales,
-        storeCollection,
-        paypayCollection,
-        paypayTimeHour,
-        paypayTimeMin,
-      })
-      .then((res) => {
-        setSaving(false);
-        console.log('save res:', res);
-        back();
-      })
-      .catch((err) => {
-        setSaving(false);
-        console.log('err:', err);
-      });
-  };
 
   if (loading) return <Loader />;
   else
@@ -282,56 +232,7 @@ export default function Page({
               </p>
             </div>
           </div>
-
-          <div className='mt-4 flex justify-center'>
-            <button
-              type='submit'
-              className='w-80 rounded-3xl bg-[#d90000] py-2'
-              onClick={() => setIsModalOpen(true)}
-            >
-              <p className='text-xl font-bold text-white'>集計を確定する</p>
-            </button>
-          </div>
         </div>
-        {/* {isModalOpen && (
-          <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75'>
-            <div
-              className='w-96 rounded-lg bg-white p-6 shadow-lg'
-              onClick={(e) => e.stopPropagation()}
-            >
-              <p className='text-center text-xl font-bold'>
-                この内容で確定しますか？
-              </p>
-              <div className='mt-4 flex justify-center'>
-                {saving ? (
-                  <Hourglass
-                    visible={true}
-                    height='24'
-                    width='24'
-                    ariaLabel='hourglass-loading'
-                    wrapperClass='self-center my-auto'
-                    colors={['#000', '#000']}
-                  />
-                ) : (
-                  <div className='flex flex-row justify-center'>
-                    <button
-                      onClick={closeModal}
-                      className='mr-4 w-32 rounded bg-[#868686] px-4 py-2 text-white hover:bg-red-700'
-                    >
-                      戻る
-                    </button>
-                    <button
-                      onClick={submitData}
-                      className='w-32 rounded bg-[#D90000] px-4 py-2 text-white hover:bg-red-700'
-                    >
-                      OK
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )} */}
       </main>
     );
 }

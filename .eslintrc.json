@@ -19,8 +19,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
     "next",
-    "next/core-web-vitals",
-    "universe/native"
+    "next/core-web-vitals"
   ],
   "plugins": ["@typescript-eslint", "prettier", "react"],
   "rules": {
