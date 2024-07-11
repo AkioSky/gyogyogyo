@@ -28,6 +28,7 @@ export default function Page({ params }: { params: { id: string } }) {
   useEffect(() => {
     setLoading(true);
     if (params.id) {
+      console.log('startDate:', startDate);
       axios
         .post(`/api/store/item`, { id: params.id, startDate })
         .then((res) => {
