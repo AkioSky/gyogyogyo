@@ -3,7 +3,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
 import _ from 'lodash';
-import moment from 'moment-timezone';
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,9 +27,7 @@ export default async function handler(
     });
 
     const dates = _.map(sales, 'date');
-    const days = _.map(dates, (date) =>
-      parseInt(moment.tz(date, 'Asia/Tokyo').format('DD'))
-    );
+    const days = _.map(dates, (date) => date.getDate());
     const totalSalesSum = _.sumBy(sales, 'totalSales');
 
     res.status(200).json({ store, days, totalSalesSum });

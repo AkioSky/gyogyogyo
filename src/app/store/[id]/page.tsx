@@ -8,7 +8,6 @@ import axios from 'axios';
 import 'react-calendar/dist/Calendar.css';
 import Navbar from '@/app/components/navigation/navbar';
 import { Store } from '@prisma/client';
-import moment from 'moment-timezone';
 import { Hourglass } from 'react-loader-spinner';
 
 const getFirstDateOfMonth = () => {
@@ -20,7 +19,6 @@ const getFirstDateOfMonth = () => {
     1
   );
   return firstDateOfMonth;
-  // return moment.tz('Asia/Tokyo').startOf('month').toDate();
 };
 
 export default function Page({ params }: { params: { id: string } }) {
