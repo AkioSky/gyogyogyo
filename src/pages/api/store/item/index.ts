@@ -14,7 +14,7 @@ export default async function handler(
 
     const date = new Date(startDate);
     const year = date.getFullYear();
-    const month = date.getMonth() + 1; // getMonth() returns 0-11, so we add 1
+    const month = date.getMonth() + 1;
     const lastDate = new Date(year, month, 0);
     const sales = await prisma.sales.findMany({
       where: {

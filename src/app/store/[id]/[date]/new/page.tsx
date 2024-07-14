@@ -75,7 +75,7 @@ export default function Page({
               id: product.id,
               name: product.name,
               price: product.basicPrice,
-              previousCount: previousProduct.count,
+              previousCount: previousProduct ? previousProduct.count : 0,
               remainCount: 0,
               restockCount: 0,
             };
