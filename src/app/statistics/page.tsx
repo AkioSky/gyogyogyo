@@ -71,6 +71,19 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [calRowData, setCalRowData] = useState<SalesData[]>([]);
   const [calColDefs, setCalColDefs] = useState<ColDef[]>([]);
+  const [viewportHeight, setViewportHeight] = useState<number>(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportHeight(window.innerHeight);
+    };
+
+    setViewportHeight(window.innerHeight);
+
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (selectedMonth) {
@@ -94,18 +107,24 @@ export default function Page() {
               {
                 field: 'day',
                 headerName: '',
-                minWidth: 70,
+                minWidth: 80,
                 cellClass: [
                   'font-bold',
                   'text-base',
                   'text-center',
                   'border-[#707070]',
                 ],
+                colSpan: (params) => {
+                  if (params.data.weekday === '') {
+                    return 2;
+                  }
+                  return 1;
+                },
               },
               {
                 field: 'weekday',
                 headerName: '',
-                minWidth: 70,
+                minWidth: 80,
                 cellClass: [
                   'font-bold',
                   'text-base',
@@ -117,7 +136,36 @@ export default function Page() {
             ]);
 
             const salesByStore = _.groupBy(res.data.sales, 'storeId');
-            console.log('salesByStore:', salesByStore);
+            const sumSalesByStore: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(
+                  result,
+                  storeId,
+                  _.sumBy(salesByStore[storeId], 'totalSales')
+                );
+                return result;
+              },
+              {}
+            );
+            console.log('sumSalesByStore:', sumSalesByStore);
+
+            const sortedStoreArr = _.orderBy(
+              _.toPairs(sumSalesByStore),
+              ([, value]) => value,
+              ['desc']
+            );
+            let rank = 1;
+            let previousValue = sortedStoreArr[0][1];
+            const salesRankByStore: { [key: string]: string } = {};
+            sortedStoreArr.forEach(([key, value], index) => {
+              if (value < previousValue) {
+                rank = index + 1;
+              }
+              salesRankByStore[key] = `${rank}位`;
+              previousValue = value;
+            });
+            console.log('salesRankByStore:', salesRankByStore);
 
             const salesByDay = _.map(
               res.data.sales,
@@ -128,7 +176,6 @@ export default function Page() {
               })
             );
             const groupedSalesData = _.groupBy(salesByDay, 'day');
-
             const allSalesByDay = _.map(days, (day) => {
               const groupedByStore = _.groupBy(groupedSalesData[day], 'store');
               const saleByStore = _.reduce(
@@ -146,7 +193,34 @@ export default function Page() {
                 weekday: getDayOfWeek(day),
               };
             });
-            setCalRowData(allSalesByDay);
+
+            const emptyRowData = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(result, storeId, '');
+                return result;
+              },
+              {}
+            );
+
+            setCalRowData([
+              {
+                day: '売上ランキング ',
+                weekday: '',
+                ...salesRankByStore,
+              },
+              {
+                day: '店舗売上',
+                weekday: '',
+                ..._.mapValues(sumSalesByStore, (value) => `¥${value}`),
+              },
+              {
+                day: '',
+                weekday: '',
+                ...emptyRowData,
+              },
+              ...allSalesByDay,
+            ]);
           }
           setLoading(false);
         })
@@ -176,13 +250,10 @@ export default function Page() {
             className='w-56 border-0 text-2xl font-bold'
           />
         </div>
-        <div className='ag-theme-quartz' style={{ height: 500 }}>
-          {/* <AgGridReact
-            rowData={calRowData}
-            columnDefs={calColDefs}
-            defaultColDef={defaultColDef}
-          /> */}
-
+        <div
+          className='ag-theme-quartz'
+          style={{ height: viewportHeight - 180 }}
+        >
           <AgGridReact
             rowData={calRowData}
             columnDefs={calColDefs}
