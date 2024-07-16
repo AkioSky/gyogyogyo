@@ -76,6 +76,7 @@ model Product {
   displayCount  Int?
   store         Store?      @relation(fields: [storeId], references: [id])
   storeId       String?     
+  enable        Boolean     @default(true)
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   @@map(name: "products")

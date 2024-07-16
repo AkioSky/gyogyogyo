@@ -21,7 +21,7 @@ export default async function handler(
 
   try {
     const store = await prisma.store.findUnique({ where: { id: storeId } });
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({ where: { enable: true } });
     const previousProducts = await prisma.currentProductCount.findMany({
       where: { storeId },
     });
