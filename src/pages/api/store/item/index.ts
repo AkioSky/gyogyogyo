@@ -10,7 +10,10 @@ export default async function handler(
 ) {
   try {
     const { id, startDate } = req.body;
-    const store = await prisma.store.findUnique({ where: { id } });
+    const store = await prisma.store.findUnique({
+      where: { id },
+      cacheStrategy: { ttl: 60 },
+    });
 
     const date = new Date(startDate);
     const year = date.getFullYear();
@@ -24,10 +27,10 @@ export default async function handler(
           lt: lastDate,
         },
       },
+      cacheStrategy: { ttl: 60 },
     });
-
     const dates = _.map(sales, 'date');
-    const days = _.map(dates, (date) => date.getDate());
+    const days = _.map(dates, (date) => date.getUTCDate());
     const totalSalesSum = _.sumBy(sales, 'totalSales');
 
     res.status(200).json({ store, days, totalSalesSum });

@@ -57,7 +57,6 @@ export default function Page({
             const product = _.find(res.data.products, {
               id: productSale.productId,
             });
-
             return {
               id: product.id,
               name: product.name,

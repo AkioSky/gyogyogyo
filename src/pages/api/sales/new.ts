@@ -20,10 +20,17 @@ export default async function handler(
   }
 
   try {
-    const store = await prisma.store.findUnique({ where: { id: storeId } });
-    const products = await prisma.product.findMany({ where: { enable: true } });
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      cacheStrategy: { ttl: 60 },
+    });
+    const products = await prisma.product.findMany({
+      where: { enable: true },
+      cacheStrategy: { ttl: 60 },
+    });
     const previousProducts = await prisma.currentProductCount.findMany({
       where: { storeId },
+      cacheStrategy: { ttl: 60 },
     });
     res.status(200).json({ store, products, previousProducts });
   } catch (error) {

@@ -38,6 +38,7 @@ export default function Page({ params }: { params: { id: string } }) {
         .post(`/api/store/item`, { id: params.id, startDate })
         .then((res) => {
           if (res.status === 200) {
+            console.log('res:', res.data);
             setStore(res.data.store);
             setDays(res.data.days);
             setTotalSales(res.data.totalSalesSum);

@@ -9,7 +9,7 @@ export default async function handler(
 ) {
   try {
     const { selectedDate } = req.body;
-    const stores = await prisma.store.findMany();
+    const stores = await prisma.store.findMany({ cacheStrategy: { ttl: 60 } });
 
     const date = new Date(selectedDate);
     const year = date.getFullYear();
@@ -22,6 +22,7 @@ export default async function handler(
           lt: lastDate,
         },
       },
+      cacheStrategy: { ttl: 60 },
     });
 
     res.status(200).json({ stores, sales });

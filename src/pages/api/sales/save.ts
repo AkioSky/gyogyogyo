@@ -31,6 +31,7 @@ export default async function handler(
           productId: product.id,
           storeId,
         },
+        cacheStrategy: { ttl: 60 },
       });
       if (existingProductCount) {
         await prisma.currentProductCount.update({
@@ -57,6 +58,7 @@ export default async function handler(
           storeId,
           date: new Date(date),
         },
+        cacheStrategy: { ttl: 60 },
       });
       if (existingProductSaleCount === 0) {
         await prisma.productSale.create({
