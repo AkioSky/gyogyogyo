@@ -103,6 +103,7 @@ export default function Page() {
               cellClass: ['text-base', 'text-center', 'border-[#707070]'],
             }));
             const storeIds = _.map(stores, 'field');
+            const storeById = _.keyBy(res.data.stores, 'id');
             setCalColDefs([
               {
                 field: 'day',
@@ -136,7 +137,7 @@ export default function Page() {
             ]);
 
             const salesByStore = _.groupBy(res.data.sales, 'storeId');
-            const sumSalesByStore: { [key: string]: number } = _.reduce(
+            const sumTotalSalesByStore: { [key: string]: number } = _.reduce(
               storeIds,
               (result, storeId) => {
                 _.set(
@@ -148,10 +149,140 @@ export default function Page() {
               },
               {}
             );
-            console.log('sumSalesByStore:', sumSalesByStore);
+            const sumCashByStore: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(
+                  result,
+                  storeId,
+                  _.sumBy(salesByStore[storeId], 'storeCollection')
+                );
+                return result;
+              },
+              {}
+            );
+            const sumPayPayByStore: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(
+                  result,
+                  storeId,
+                  _.sumBy(salesByStore[storeId], 'paypayCollection')
+                );
+                return result;
+              },
+              {}
+            );
+            const sumCollectedByStore: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(
+                  result,
+                  storeId,
+                  _.sumBy(salesByStore[storeId], 'paypayCollection') +
+                    _.sumBy(salesByStore[storeId], 'storeCollection')
+                );
+                return result;
+              },
+              {}
+            );
+            const sumDiffCostByStore: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(
+                  result,
+                  storeId,
+                  _.sumBy(salesByStore[storeId], 'paypayCollection') +
+                    _.sumBy(salesByStore[storeId], 'storeCollection') -
+                    _.sumBy(salesByStore[storeId], 'totalSales')
+                );
+                return result;
+              },
+              {}
+            );
+            const sharingByStoreId: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(result, storeId, storeById[storeId].sharing);
+                return result;
+              },
+              {}
+            );
+            const rentByStoreId: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(result, storeId, storeById[storeId].rent);
+                return result;
+              },
+              {}
+            );
+            const ebByStoreId: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(result, storeId, storeById[storeId].eb);
+                return result;
+              },
+              {}
+            );
+            const usenByStoreId: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(result, storeId, storeById[storeId].usen);
+                return result;
+              },
+              {}
+            );
+            const outsourcingByStoreId: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(result, storeId, storeById[storeId].outsourcing);
+                return result;
+              },
+              {}
+            );
+            const sgaByStoreId: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(
+                  result,
+                  storeId,
+                  storeById[storeId].rent +
+                    storeById[storeId].eb +
+                    storeById[storeId].usen +
+                    storeById[storeId].outsourcing
+                );
+                return result;
+              },
+              {}
+            );
+            const costByStoreId: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(result, storeId, storeById[storeId].cost);
+                return result;
+              },
+              {}
+            );
+            const profitByStoreId: { [key: string]: number } = _.reduce(
+              storeIds,
+              (result, storeId) => {
+                _.set(
+                  result,
+                  storeId,
+                  _.sumBy(salesByStore[storeId], 'totalSales') -
+                    (storeById[storeId].rent +
+                      storeById[storeId].eb +
+                      storeById[storeId].usen +
+                      storeById[storeId].outsourcing +
+                      storeById[storeId].cost)
+                );
+                return result;
+              },
+              {}
+            );
 
             const sortedStoreArr = _.orderBy(
-              _.toPairs(sumSalesByStore),
+              _.toPairs(sumTotalSalesByStore),
               ([, value]) => value,
               ['desc']
             );
@@ -165,7 +296,6 @@ export default function Page() {
               salesRankByStore[key] = `${rank}位`;
               previousValue = value;
             });
-            console.log('salesRankByStore:', salesRankByStore);
 
             const salesByDay = _.map(
               res.data.sales,
@@ -210,9 +340,73 @@ export default function Page() {
                 ...salesRankByStore,
               },
               {
-                day: '店舗売上',
+                day: '自社総売上',
                 weekday: '',
-                ..._.mapValues(sumSalesByStore, (value) => `¥${value}`),
+                ..._.mapValues(sumTotalSalesByStore, (value) => `¥${value}`),
+              },
+              {
+                day: '現金回収',
+                weekday: '',
+                ..._.mapValues(sumCashByStore, (value) => `¥${value}`),
+              },
+              {
+                day: 'paypay回収',
+                weekday: '',
+                ..._.mapValues(sumPayPayByStore, (value) => `¥${value}`),
+              },
+              {
+                day: '総回収額',
+                weekday: '',
+                ..._.mapValues(sumCollectedByStore, (value) => `¥${value}`),
+              },
+              {
+                day: '差額',
+                weekday: '',
+                ..._.mapValues(sumDiffCostByStore, (value) =>
+                  value >= 0 ? `¥${value}` : `-¥${Math.abs(value)}`
+                ),
+              },
+              {
+                day: 'シェアリング売上',
+                weekday: '',
+                ..._.mapValues(sharingByStoreId, (value) => `¥${value}`),
+              },
+              {
+                day: '家賃',
+                weekday: '',
+                ..._.mapValues(rentByStoreId, (value) => `¥${value}`),
+              },
+              {
+                day: '電気代',
+                weekday: '',
+                ..._.mapValues(ebByStoreId, (value) => `¥${value}`),
+              },
+              {
+                day: 'USEN',
+                weekday: '',
+                ..._.mapValues(usenByStoreId, (value) => `¥${value}`),
+              },
+              {
+                day: '外部委託費',
+                weekday: '',
+                ..._.mapValues(outsourcingByStoreId, (value) => `¥${value}`),
+              },
+              {
+                day: '販売管理費合計',
+                weekday: '',
+                ..._.mapValues(sgaByStoreId, (value) => `¥${value}`),
+              },
+              {
+                day: '商品原価',
+                weekday: '',
+                ..._.mapValues(costByStoreId, (value) => `¥${value}`),
+              },
+              {
+                day: '当月利益',
+                weekday: '',
+                ..._.mapValues(profitByStoreId, (value) =>
+                  value >= 0 ? `¥${value}` : `-¥${Math.abs(value)}`
+                ),
               },
               {
                 day: '',
@@ -231,15 +425,11 @@ export default function Page() {
     }
   }, [selectedMonth]);
 
-  const defaultColDef = {
-    flex: 1,
-  };
-
   return (
     <main className='flex h-screen flex-col'>
       <Navbar title='各種データ' />
       <div className='p-4'>
-        <div className='my-8'>
+        <div className='my-8 text-center'>
           <DatePicker
             dateFormat='MMM yyy'
             showMonthYearPicker
@@ -247,7 +437,8 @@ export default function Page() {
             onChange={(date) => setSelectedMonth(date)}
             locale='ja'
             wrapperClassName=''
-            className='w-56 border-0 text-2xl font-bold'
+            className='w-56 border-0 text-center text-2xl font-bold'
+            maxDate={new Date()}
           />
         </div>
         <div
@@ -257,7 +448,9 @@ export default function Page() {
           <AgGridReact
             rowData={calRowData}
             columnDefs={calColDefs}
-            defaultColDef={defaultColDef}
+            defaultColDef={{
+              flex: 1,
+            }}
           />
         </div>
       </div>

@@ -59,6 +59,12 @@ model Store {
   address       String?      
   products      Product[]
   sales         Sales[]
+  sharing       Int         @default(0)
+  rent          Int         @default(0)
+  eb            Int         @default(0)
+  usen          Int         @default(0)
+  outsourcing   Int         @default(0)
+  cost          Int         @default(0)
   openAt        DateTime?   @map(name: "open_at")
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
