@@ -14,46 +14,24 @@ model User {
   email         String      @unique
   password      String
   scope         String?
-  companyId     String?
   storeId       String[]
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
   @@map(name: "users")
 }
 
-model Company {
-  id            Int         @default(autoincrement()) @id
-  name          String?     @unique
-  stores        Store[]
-  createdAt     DateTime    @default(now()) @map(name: "created_at")
-  updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
-  @@map(name: "company")
-}
-
-model Category {
+model Maker {
   id            Int         @default(autoincrement()) @id
   name          String?     @unique
   products      Product[]
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
-  @@map(name: "category")
-}
-
-model Manufacturer {
-  id            Int         @default(autoincrement()) @id
-  name          String?     @unique
-  products      Product[]
-  createdAt     DateTime    @default(now()) @map(name: "created_at")
-  updatedAt     DateTime    @updatedAt @map(name: "updated_at")  
-  @@map(name: "manufacturer")
+  @@map(name: "maker")
 }
 
 model Store {
   id            String      @default(cuid()) @id
   name          String      @unique
-  category      String?
-  companyId     Int?
-  company       Company?    @relation(fields: [companyId], references: [id])
   state         String?
   zipcode       String?
   address       String?      
@@ -75,10 +53,10 @@ model Product {
   id            String      @default(cuid()) @id
   name          String      @unique
   basicPrice    Float       @default(0)
-  manufacturerId  Int?
-  manufacturer  Manufacturer?   @relation(fields: [manufacturerId], references: [id])
-  categoryId    Int?
-  category      Category?   @relation(fields: [categoryId], references: [id])
+  salePrice     Float       @default(0)
+  cost          Float       @default(0)
+  makerId       Int?
+  maker         Maker?      @relation(fields: [makerId], references: [id])
   displayCount  Int?
   store         Store?      @relation(fields: [storeId], references: [id])
   storeId       String?     
