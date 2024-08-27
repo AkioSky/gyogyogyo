@@ -58,6 +58,8 @@ export default function Page({
   const { back } = useRouter();
 
   useEffect(() => {
+    console.log('storeId:', params.id);
+    console.log('date:', params.date);
     axios
       .post('/api/sales/new', {
         storeId: params.id,
@@ -74,7 +76,7 @@ export default function Page({
             return {
               id: product.id,
               name: product.name,
-              price: product.basicPrice,
+              price: product.price,
               previousCount: previousProduct ? previousProduct.count : 0,
               remainCount: 0,
               restockCount: 0,

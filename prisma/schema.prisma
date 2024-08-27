@@ -31,19 +31,15 @@ model Maker {
 
 model Store {
   id            String      @default(cuid()) @id
-  name          String      @unique
-  state         String?
-  zipcode       String?
-  address       String?      
-  products      Product[]
+  name          String      @unique     
+  products      String[] 
   sales         Sales[]
   sharing       Int         @default(0)
   rent          Int         @default(0)
   eb            Int         @default(0)
   usen          Int         @default(0)
   outsourcing   Int         @default(0)
-  cost          Int         @default(0)
-  openAt        DateTime?   @map(name: "open_at")
+  etc           Int         @default(0)
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   @@map(name: "stores")
@@ -52,15 +48,11 @@ model Store {
 model Product {
   id            String      @default(cuid()) @id
   name          String      @unique
-  basicPrice    Float       @default(0)
+  price         Float       @default(0)
   salePrice     Float       @default(0)
   cost          Float       @default(0)
   makerId       Int?
   maker         Maker?      @relation(fields: [makerId], references: [id])
-  displayCount  Int?
-  store         Store?      @relation(fields: [storeId], references: [id])
-  storeId       String?     
-  enable        Boolean     @default(true)
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   @@map(name: "products")

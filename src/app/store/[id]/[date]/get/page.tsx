@@ -60,7 +60,7 @@ export default function Page({
             return {
               id: product.id,
               name: product.name,
-              price: product.basicPrice,
+              price: product.price,
               previousCount: productSale.previousCount,
               remainCount: productSale.remainCount,
               restockCount: productSale.restockCount,

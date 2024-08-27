@@ -274,7 +274,7 @@ export default function Page() {
                       storeById[storeId].eb +
                       storeById[storeId].usen +
                       storeById[storeId].outsourcing +
-                      storeById[storeId].cost)
+                      storeById[storeId].etc)
                 );
                 return result;
               },
@@ -396,11 +396,11 @@ export default function Page() {
                 weekday: '',
                 ..._.mapValues(sgaByStoreId, (value) => `¥${value}`),
               },
-              {
-                day: '商品原価',
-                weekday: '',
-                ..._.mapValues(costByStoreId, (value) => `¥${value}`),
-              },
+              // {
+              //   day: '商品原価',
+              //   weekday: '',
+              //   ..._.mapValues(costByStoreId, (value) => `¥${value}`),
+              // },
               {
                 day: '当月利益',
                 weekday: '',
