@@ -45,9 +45,10 @@ model Store {
   @@map(name: "stores")
 }
 
-model Product {
+model Product {  
   id            String      @default(cuid()) @id
   name          String      @unique
+  order         Int         @default(autoincrement())
   price         Float       @default(0)
   salePrice     Float       @default(0)
   cost          Float       @default(0)
