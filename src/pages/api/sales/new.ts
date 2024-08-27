@@ -25,7 +25,6 @@ export default async function handler(
       cacheStrategy: { ttl: 60 },
     });
     const products = await prisma.product.findMany({
-      where: { enable: true },
       cacheStrategy: { ttl: 60 },
     });
     const previousProducts = await prisma.currentProductCount.findMany({
