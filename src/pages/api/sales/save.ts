@@ -88,6 +88,6 @@ export default async function handler(
 
     res.status(200).json({ status: 'success' });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to save sales' });
+    res.status(500).json({ error });
   }
 }
