@@ -60,17 +60,19 @@ model Product {
 }
 
 model CurrentProductCount {
-  id            String      @default(cuid()) @id
+  id            Int         @id @default(autoincrement())
   storeId       String
   productId     String
   count         Int
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+
+  @@unique([productId, storeId])
   @@map(name: "current_product_count")
 }
 
 model ProductSale {
-  id            String      @default(cuid()) @id
+  id            Int         @id @default(autoincrement())
   date          DateTime    @db.Date
   storeId       String
   productId     String
@@ -80,10 +82,11 @@ model ProductSale {
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   @@map(name: "product_sale")
+  @@unique([productId, storeId, date])
 }
 
 model Sales {
-  id            String      @default(cuid()) @id
+  id            Int         @id @default(autoincrement())
   date          DateTime    @db.Date
   storeId       String
   store         Store?      @relation(fields: [storeId], references: [id])
@@ -95,4 +98,5 @@ model Sales {
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   @@map(name: "sales")
+  @@unique([storeId, date])
 }
