@@ -25,6 +25,14 @@ export default async function handler(
       cacheStrategy: { ttl: 60 },
     });
     const products = await prisma.product.findMany({
+      where: {
+        id: {
+          in: store?.products,
+        },
+      },
+      cacheStrategy: { ttl: 60 },
+    });
+    const makers = await prisma.maker.findMany({
       cacheStrategy: { ttl: 60 },
     });
     const productSales = await prisma.productSale.findMany({
@@ -38,7 +46,7 @@ export default async function handler(
       where: { storeId, date: new Date(date) },
       cacheStrategy: { ttl: 60 },
     });
-    res.status(200).json({ store, productSales, products, sales });
+    res.status(200).json({ store, productSales, products, makers, sales });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch products' });
   }

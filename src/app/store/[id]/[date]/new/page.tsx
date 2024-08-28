@@ -78,7 +78,6 @@ export default function Page({
             const previousProduct = _.find(res.data.previousProducts, {
               productId: product.id,
             });
-
             return {
               id: product.id,
               name: product.name,
