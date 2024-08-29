@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '@/app/components/navigation/navbar';
 import Loader from '@/app/components/loader';
-import { Store, ProductSale, Maker } from '@prisma/client';
+import { Store, Maker, Product } from '@prisma/client';
 import _ from 'lodash';
 import moment from 'moment-timezone';
 import { CombinedProduct } from '@/app/models/CombinedProduct';
@@ -16,6 +16,62 @@ const ProductInput = ({ value }: { value: number }) => (
     disabled
   />
 );
+
+const CalcByStore = ({
+  maker,
+  products,
+}: {
+  maker: Maker;
+  products: CombinedProduct[];
+}) => {
+  const tmpProducts = products.filter(
+    (product: CombinedProduct) =>
+      product.previousCount - product.remainCount != 0
+  );
+  if (tmpProducts.length > 0) {
+    const sum = products.reduce((sum, product) => {
+      const difference = product.previousCount - product.remainCount;
+      return sum + product.price * difference;
+    }, 0);
+    return (
+      <div key={`maker-sum-${maker.id}`}>
+        <div className='bg-[#EFEFEF] py-2 pl-4 text-lg font-bold'>
+          {maker.name}
+        </div>
+        <div className='border-t border-[#d8d4d4]'>
+          {_.sortBy(tmpProducts, (product) => product.order).map(
+            (product: CombinedProduct, index: number) => (
+              <div
+                className='flex flex-row border-b border-[#707070] px-4'
+                key={index}
+              >
+                <div className='flex-1 py-2 text-base'>{product.name}</div>
+                <div className='flex w-20 items-center justify-center text-xl '>
+                  {product.previousCount - product.remainCount}
+                </div>
+                <div className='flex w-24 items-center justify-end text-right sm:w-32 md:w-48'>
+                  <p className='text-xl font-bold'>
+                    ¥
+                    {product.price *
+                      (product.previousCount - product.remainCount)}
+                  </p>
+                </div>
+              </div>
+            )
+          )}
+          <div className='mb-4 flex flex-row px-4'>
+            <div className='flex-1 py-2 text-lg font-bold'>合計</div>
+            <div className='flex w-20 items-center justify-end font-bold sm:w-24 md:w-40'>
+              <p className='text-xl'>¥{sum}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    return <></>;
+  }
+};
 
 export default function Page({
   params,
@@ -59,9 +115,9 @@ export default function Page({
         );
 
         const combined: CombinedProduct[] = _.compact(
-          res.data.productSales.map((productSale: ProductSale) => {
-            const product = _.find(res.data.products, {
-              id: productSale.productId,
+          res.data.products.map((product: Product) => {
+            const productSale = _.find(res.data.productSales, {
+              productId: product.id,
             });
             return {
               id: product.id,
@@ -149,51 +205,11 @@ export default function Page({
             売上データ
           </div>
           {makers.map((maker) => (
-            <div key={`maker-sum-${maker.id}`}>
-              <div className='bg-[#EFEFEF] py-2 pl-4 text-lg font-bold'>
-                {maker.name}
-              </div>
-              <div className='border-t border-[#707070]'>
-                {_.sortBy(groupByMaker[maker.id], (product) => product.order)
-                  .filter(
-                    (product: CombinedProduct) =>
-                      product.previousCount - product.remainCount != 0
-                  )
-                  .map((product: CombinedProduct, index: number) => (
-                    <div
-                      className='flex flex-row border-b border-[#707070] px-4'
-                      key={index}
-                    >
-                      <div className='flex-1 py-2 text-base'>
-                        {product.name}
-                      </div>
-                      <div className='flex w-20 items-center justify-center text-xl '>
-                        {product.previousCount - product.remainCount}
-                      </div>
-                      <div className='flex w-24 items-center justify-end text-right sm:w-32 md:w-48'>
-                        <p className='text-xl font-bold'>
-                          ¥
-                          {product.price *
-                            (product.previousCount - product.remainCount)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                <div className='flex flex-row px-4'>
-                  <div className='flex-1 py-2 text-lg font-bold'>合計</div>
-                  <div className='flex w-20 items-center justify-end font-bold sm:w-24 md:w-40'>
-                    <p className='text-xl'>
-                      ¥
-                      {groupByMaker[maker.id].reduce((sum, product) => {
-                        const difference =
-                          product.previousCount - product.remainCount;
-                        return sum + product.price * difference;
-                      }, 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <CalcByStore
+              key={`maker-sum-${maker.id}`}
+              maker={maker}
+              products={groupByMaker[maker.id]}
+            />
           ))}
 
           <div className='mt-2 flex flex-row bg-[#E5F2FF] px-4'>

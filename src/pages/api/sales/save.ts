@@ -2,7 +2,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
-import { CombinedProduct } from '@/app/models/CombinedProduct';
+import _ from 'lodash';
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,83 +25,47 @@ export default async function handler(
   } = req.body;
 
   try {
-    const productOperations = products.map(async (product: CombinedProduct) => {
-      // const existingProductCount = await prisma.currentProductCount.findFirst({
-      //   where: {
-      //     productId: product.id,
-      //     storeId,
-      //   },
-      //   cacheStrategy: { ttl: 60 },
-      // });
-      // if (existingProductCount) {
-      //   prisma.currentProductCount.update({
-      //     where: {
-      //       id: existingProductCount.id,
-      //     },
-      //     data: {
-      //       count: product.remainCount + product.restockCount,
-      //     },
-      //   });
-      // } else {
-      //   prisma.currentProductCount.create({
-      //     data: {
-      //       productId: product.id,
-      //       storeId,
-      //       count: product.remainCount + product.restockCount,
-      //     },
-      //   });
-      // }
-
-      await prisma.currentProductCount.upsert({
-        where: {
-          productId_storeId: {
-            productId: product.id,
-            storeId: storeId,
-          },
-        },
-        update: {
-          count: product.remainCount + product.restockCount,
-        },
-        create: {
-          productId: product.id,
-          storeId,
-          count: product.remainCount + product.restockCount,
-        },
-      });
-
-      const existingProductSaleCount = await prisma.productSale.count({
-        where: {
-          productId: product.id,
-          storeId,
+    const productIds = _.map(products, 'id');
+    const currentProductCountData = _.map(products, (product) => ({
+      productId: product.id,
+      storeId,
+      count: product.remainCount + product.restockCount,
+    }));
+    const productSaleData = _.map(products, (product) => ({
+      date: new Date(date),
+      productId: product.id,
+      storeId,
+      previousCount: product.previousCount,
+      remainCount: product.remainCount,
+      restockCount: product.restockCount,
+    }));
+    prisma.$transaction([
+      prisma.currentProductCount.deleteMany({
+        where: { productId: { in: productIds }, storeId },
+      }),
+      prisma.productSale.deleteMany({
+        where: { productId: { in: productIds }, storeId, date: new Date(date) },
+      }),
+      prisma.currentProductCount.createMany({
+        data: currentProductCountData,
+        skipDuplicates: true,
+      }),
+      prisma.productSale.createMany({
+        data: productSaleData,
+        skipDuplicates: true,
+      }),
+      prisma.sales.create({
+        data: {
           date: new Date(date),
+          totalSales,
+          storeCollection,
+          paypayCollection,
+          paypayTimeHour,
+          paypayTimeMin,
+          storeId,
         },
-      });
-      if (existingProductSaleCount === 0) {
-        prisma.productSale.create({
-          data: {
-            date: new Date(date),
-            productId: product.id,
-            storeId,
-            previousCount: product.previousCount,
-            remainCount: product.remainCount,
-            restockCount: product.restockCount,
-          },
-        });
-      }
-    });
-    await Promise.all(productOperations);
-
-    await prisma.sales.create({
-      data: {
-        date: new Date(date),
-        totalSales,
-        storeCollection,
-        paypayCollection,
-        paypayTimeHour,
-        paypayTimeMin,
-        storeId,
-      },
-    });
+      }),
+    ]);
 
     res.status(200).json({ status: 'success' });
   } catch (error) {

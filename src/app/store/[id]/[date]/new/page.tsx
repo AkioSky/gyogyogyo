@@ -21,7 +21,7 @@ const ProductInput = ({
   <input
     type='number'
     className='w-14 border border-[#707070] text-center'
-    value={value}
+    value={value || ''}
     onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
       if (['-', 'e', 'E'].includes(event.key)) {
         event.preventDefault();
@@ -34,6 +34,62 @@ const ProductInput = ({
     }}
   />
 );
+
+const CalcByStore = ({
+  maker,
+  products,
+}: {
+  maker: Maker;
+  products: CombinedProduct[];
+}) => {
+  const tmpProducts = products.filter(
+    (product: CombinedProduct) =>
+      product.previousCount - product.remainCount != 0
+  );
+  if (tmpProducts.length > 0) {
+    const sum = products.reduce((sum, product) => {
+      const difference = product.previousCount - product.remainCount;
+      return sum + product.price * difference;
+    }, 0);
+    return (
+      <div key={`maker-sum-${maker.id}`}>
+        <div className='bg-[#EFEFEF] py-2 pl-4 text-lg font-bold'>
+          {maker.name}
+        </div>
+        <div className='border-t border-[#d8d4d4]'>
+          {_.sortBy(tmpProducts, (product) => product.order).map(
+            (product: CombinedProduct, index: number) => (
+              <div
+                className='flex flex-row border-b border-[#707070] px-4'
+                key={index}
+              >
+                <div className='flex-1 py-2 text-base'>{product.name}</div>
+                <div className='flex w-20 items-center justify-center text-xl '>
+                  {product.previousCount - product.remainCount}
+                </div>
+                <div className='flex w-24 items-center justify-end text-right sm:w-32 md:w-48'>
+                  <p className='text-xl font-bold'>
+                    ¥
+                    {product.price *
+                      (product.previousCount - product.remainCount)}
+                  </p>
+                </div>
+              </div>
+            )
+          )}
+          <div className='mb-4 flex flex-row px-4'>
+            <div className='flex-1 py-2 text-lg font-bold'>合計</div>
+            <div className='flex w-20 items-center justify-end font-bold sm:w-24 md:w-40'>
+              <p className='text-xl'>¥{sum}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    return <></>;
+  }
+};
 
 export default function Page({
   params,
@@ -55,6 +111,7 @@ export default function Page({
     moment.tz('Asia/Tokyo').minute()
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBackModalOpen, setIsBackModalOpen] = useState(false);
 
   const { back } = useRouter();
 
@@ -84,7 +141,7 @@ export default function Page({
               price: product.price,
               makerId: product.makerId,
               order: product.order,
-              previousCount: previousProduct ? previousProduct.count : 0,
+              previousCount: previousProduct.count,
               remainCount: 0,
               restockCount: 0,
             };
@@ -158,7 +215,13 @@ export default function Page({
   else
     return (
       <main>
-        <Navbar title='納品回収 集計ページ' />
+        <Navbar
+          title='納品回収 集計ページ'
+          noHome
+          customBack={() => {
+            setIsBackModalOpen(true);
+          }}
+        />
         {store && (
           <div className='bg-[#EAEAEA] py-2 text-center'>
             <p className='text-xl font-bold'>{store?.name}</p>
@@ -222,51 +285,11 @@ export default function Page({
             売上データ
           </div>
           {makers.map((maker) => (
-            <div key={`maker-sum-${maker.id}`}>
-              <div className='bg-[#EFEFEF] py-2 pl-4 text-lg font-bold'>
-                {maker.name}
-              </div>
-              <div className='border-t border-[#d8d4d4]'>
-                {_.sortBy(groupByMaker[maker.id], (product) => product.order)
-                  .filter(
-                    (product: CombinedProduct) =>
-                      product.previousCount - product.remainCount != 0
-                  )
-                  .map((product: CombinedProduct, index: number) => (
-                    <div
-                      className='flex flex-row border-b border-[#707070] px-4'
-                      key={index}
-                    >
-                      <div className='flex-1 py-2 text-base'>
-                        {product.name}
-                      </div>
-                      <div className='flex w-20 items-center justify-center text-xl '>
-                        {product.previousCount - product.remainCount}
-                      </div>
-                      <div className='flex w-24 items-center justify-end text-right sm:w-32 md:w-48'>
-                        <p className='text-xl font-bold'>
-                          ¥
-                          {product.price *
-                            (product.previousCount - product.remainCount)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                <div className='mb-4 flex flex-row px-4'>
-                  <div className='flex-1 py-2 text-lg font-bold'>合計</div>
-                  <div className='flex w-20 items-center justify-end font-bold sm:w-24 md:w-40'>
-                    <p className='text-xl'>
-                      ¥
-                      {groupByMaker[maker.id].reduce((sum, product) => {
-                        const difference =
-                          product.previousCount - product.remainCount;
-                        return sum + product.price * difference;
-                      }, 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <CalcByStore
+              key={`maker-sum-${maker.id}`}
+              maker={maker}
+              products={groupByMaker[maker.id]}
+            />
           ))}
           <div className='mt-2 flex flex-row bg-[#E5F2FF] px-4'>
             <div className='flex-1 py-2 text-lg font-bold'>店舗売上合計</div>
@@ -284,7 +307,7 @@ export default function Page({
               <input
                 type='number'
                 className='w-20 border border-[#707070] px-1 text-right sm:w-32'
-                value={storeCollection}
+                value={storeCollection || ''}
                 onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                   if (['-', 'e', 'E'].includes(event.key)) {
                     event.preventDefault();
@@ -305,7 +328,7 @@ export default function Page({
               <input
                 type='number'
                 className='w-20 border border-[#707070] px-1 text-right sm:w-32'
-                value={paypayCollection}
+                value={paypayCollection || ''}
                 onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                   if (['-', 'e', 'E'].includes(event.key)) {
                     event.preventDefault();
@@ -425,6 +448,30 @@ export default function Page({
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        )}
+        {isBackModalOpen && (
+          <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75'>
+            <div
+              className='w-96 justify-center rounded-lg bg-white p-6 shadow-lg'
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className='text-center text-xl font-bold'>保管しませんか？</p>
+              <div className='mt-8 flex flex-row justify-center'>
+                <button
+                  onClick={() => setIsBackModalOpen(false)}
+                  className='mr-4 w-32 rounded bg-[#868686] px-4 py-2 text-white hover:bg-red-700'
+                >
+                  戻る
+                </button>
+                <button
+                  onClick={() => back()}
+                  className='w-32 rounded bg-[#D90000] px-4 py-2 text-white hover:bg-red-700'
+                >
+                  OK
+                </button>
+              </div>
             </div>
           </div>
         )}

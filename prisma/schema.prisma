@@ -66,7 +66,6 @@ model CurrentProductCount {
   count         Int
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
-
   @@unique([productId, storeId])
   @@map(name: "current_product_count")
 }
@@ -81,8 +80,8 @@ model ProductSale {
   restockCount  Int
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
-  @@map(name: "product_sale")
   @@unique([productId, storeId, date])
+  @@map(name: "product_sale")
 }
 
 model Sales {
@@ -97,6 +96,6 @@ model Sales {
   paypayTimeMin     Int
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
-  @@map(name: "sales")
   @@unique([storeId, date])
+  @@map(name: "sales")
 }

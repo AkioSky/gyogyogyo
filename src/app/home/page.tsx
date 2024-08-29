@@ -29,7 +29,7 @@ export default function Page() {
 
       <div className='absolute bottom-16 left-0 right-0 text-center'>
         <p className='text-base font-bold'>ログインアカウント</p>
-        <p className='mt-4 text-xl font-bold'>株式会社マクティス</p>
+        <p className='mt-4 text-xl font-bold'>株式会社バントウ</p>
       </div>
     </main>
   );
