@@ -63,7 +63,7 @@ model CurrentProductCount {
   id            Int         @id @default(autoincrement())
   storeId       String
   productId     String
-  count         Int
+  count         String
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   @@unique([productId, storeId])
@@ -75,9 +75,9 @@ model ProductSale {
   date          DateTime    @db.Date
   storeId       String
   productId     String
-  previousCount Int
-  remainCount   Int
-  restockCount  Int
+  previousCount String
+  remainCount   String
+  restockCount  String
   createdAt     DateTime    @default(now()) @map(name: "created_at")
   updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   @@unique([productId, storeId, date])

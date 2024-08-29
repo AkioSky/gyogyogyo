@@ -15,13 +15,13 @@ const ProductInput = ({
   value,
   onChange,
 }: {
-  value: number;
+  value: string;
   onChange: (value: number) => void;
 }) => (
   <input
     type='number'
     className='w-14 border border-[#707070] text-center'
-    value={value || ''}
+    value={value}
     onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
       if (['-', 'e', 'E'].includes(event.key)) {
         event.preventDefault();
@@ -42,13 +42,16 @@ const CalcByStore = ({
   maker: Maker;
   products: CombinedProduct[];
 }) => {
-  const tmpProducts = products.filter(
+  const tmpProducts = products?.filter(
     (product: CombinedProduct) =>
-      product.previousCount - product.remainCount != 0
+      !isNaN(parseInt(product.previousCount)) &&
+      !isNaN(parseInt(product.remainCount)) &&
+      parseInt(product.previousCount) - parseInt(product.remainCount) != 0
   );
-  if (tmpProducts.length > 0) {
-    const sum = products.reduce((sum, product) => {
-      const difference = product.previousCount - product.remainCount;
+  if (tmpProducts?.length > 0) {
+    const sum = tmpProducts.reduce((sum, product) => {
+      const difference =
+        parseInt(product.previousCount) - parseInt(product.remainCount);
       return sum + product.price * difference;
     }, 0);
     return (
@@ -65,13 +68,15 @@ const CalcByStore = ({
               >
                 <div className='flex-1 py-2 text-base'>{product.name}</div>
                 <div className='flex w-20 items-center justify-center text-xl '>
-                  {product.previousCount - product.remainCount}
+                  {parseInt(product.previousCount) -
+                    parseInt(product.remainCount)}
                 </div>
                 <div className='flex w-24 items-center justify-end text-right sm:w-32 md:w-48'>
                   <p className='text-xl font-bold'>
                     ¥
                     {product.price *
-                      (product.previousCount - product.remainCount)}
+                      (parseInt(product.previousCount) -
+                        parseInt(product.remainCount))}
                   </p>
                 </div>
               </div>
@@ -141,12 +146,13 @@ export default function Page({
               price: product.price,
               makerId: product.makerId,
               order: product.order,
-              previousCount: previousProduct.count,
-              remainCount: 0,
-              restockCount: 0,
+              previousCount: previousProduct?.count || '',
+              remainCount: '',
+              restockCount: '',
             };
           })
         );
+        console.log('combined:', combined);
         setProducts(combined);
         setLoading(false);
       })
@@ -159,10 +165,18 @@ export default function Page({
   }, [params.date, params.id]);
 
   useEffect(() => {
-    const total = products.reduce((sum, product) => {
-      const difference = product.previousCount - product.remainCount;
-      return sum + product.price * difference;
-    }, 0);
+    const total = products
+      ?.filter(
+        (product: CombinedProduct) =>
+          !isNaN(parseInt(product.previousCount)) &&
+          !isNaN(parseInt(product.remainCount)) &&
+          parseInt(product.previousCount) - parseInt(product.remainCount) != 0
+      )
+      ?.reduce((sum, product) => {
+        const difference =
+          parseInt(product.previousCount) - parseInt(product.remainCount);
+        return sum + product.price * difference;
+      }, 0);
     setTotalSales(total);
   }, [products]);
 
@@ -171,9 +185,12 @@ export default function Page({
     key: keyof CombinedProduct,
     value: number
   ) => {
-    if (key === 'previousCount' && value < product.remainCount) {
+    if (key === 'previousCount' && value < parseInt(product.remainCount)) {
       return;
-    } else if (key === 'remainCount' && value > product.previousCount) {
+    } else if (
+      key === 'remainCount' &&
+      value > parseInt(product.previousCount)
+    ) {
       return;
     }
     const updatedProducts = products.map((_product) =>

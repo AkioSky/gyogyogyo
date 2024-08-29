@@ -4,7 +4,7 @@ export interface CombinedProduct {
   price: number;
   makerId: number;
   order: number;
-  previousCount: number;
-  remainCount: number;
-  restockCount: number;
+  previousCount: string;
+  remainCount: string;
+  restockCount: string;
 }

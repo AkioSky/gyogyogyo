@@ -9,10 +9,10 @@ import _ from 'lodash';
 import moment from 'moment-timezone';
 import { CombinedProduct } from '@/app/models/CombinedProduct';
 
-const ProductInput = ({ value }: { value: number }) => (
+const ProductInput = ({ value }: { value: string }) => (
   <input
     className='w-14 border border-[#707070] text-center'
-    value={value}
+    value={isNaN(parseInt(value)) ? '' : parseInt(value)}
     disabled
   />
 );
@@ -24,13 +24,16 @@ const CalcByStore = ({
   maker: Maker;
   products: CombinedProduct[];
 }) => {
-  const tmpProducts = products.filter(
+  const tmpProducts = products?.filter(
     (product: CombinedProduct) =>
-      product.previousCount - product.remainCount != 0
+      !isNaN(parseInt(product.previousCount)) &&
+      !isNaN(parseInt(product.remainCount)) &&
+      parseInt(product.previousCount) - parseInt(product.remainCount) != 0
   );
-  if (tmpProducts.length > 0) {
-    const sum = products.reduce((sum, product) => {
-      const difference = product.previousCount - product.remainCount;
+  if (tmpProducts?.length > 0) {
+    const sum = tmpProducts.reduce((sum, product) => {
+      const difference =
+        parseInt(product.previousCount) - parseInt(product.remainCount);
       return sum + product.price * difference;
     }, 0);
     return (
@@ -47,13 +50,15 @@ const CalcByStore = ({
               >
                 <div className='flex-1 py-2 text-base'>{product.name}</div>
                 <div className='flex w-20 items-center justify-center text-xl '>
-                  {product.previousCount - product.remainCount}
+                  {parseInt(product.previousCount) -
+                    parseInt(product.remainCount)}
                 </div>
                 <div className='flex w-24 items-center justify-end text-right sm:w-32 md:w-48'>
                   <p className='text-xl font-bold'>
                     ¥
                     {product.price *
-                      (product.previousCount - product.remainCount)}
+                      (parseInt(product.previousCount) -
+                        parseInt(product.remainCount))}
                   </p>
                 </div>
               </div>
@@ -141,14 +146,6 @@ export default function Page({
         setLoading(false);
       });
   }, [params.date, params.id]);
-
-  useEffect(() => {
-    const total = products.reduce((sum, product) => {
-      const difference = product.previousCount - product.remainCount;
-      return sum + product.price * difference;
-    }, 0);
-    setTotalSales(total);
-  }, [products]);
 
   const groupByMaker = _.groupBy(products, 'makerId');
   if (loading) return <Loader />;

@@ -26,20 +26,28 @@ export default async function handler(
 
   try {
     const productIds = _.map(products, 'id');
-    const currentProductCountData = _.map(products, (product) => ({
-      productId: product.id,
-      storeId,
-      count: product.remainCount + product.restockCount,
-    }));
+    const currentProductCountData = _.map(products, (product) => {
+      const remainCount = isNaN(parseInt(product.previousCount))
+        ? 0
+        : parseInt(product.previousCount);
+      const restockCount = isNaN(parseInt(product.restockCount))
+        ? 0
+        : parseInt(product.restockCount);
+      return {
+        productId: product.id,
+        storeId,
+        count: (remainCount + restockCount).toString(),
+      };
+    });
     const productSaleData = _.map(products, (product) => ({
       date: new Date(date),
       productId: product.id,
       storeId,
-      previousCount: product.previousCount,
-      remainCount: product.remainCount,
-      restockCount: product.restockCount,
+      previousCount: product.previousCount.toString(),
+      remainCount: product.remainCount.toString(),
+      restockCount: product.restockCount.toString(),
     }));
-    prisma.$transaction([
+    await prisma.$transaction([
       prisma.currentProductCount.deleteMany({
         where: { productId: { in: productIds }, storeId },
       }),
